@@ -1,0 +1,88 @@
+version: '3.5'
+networks:
+  development:
+  test:
+volumes:
+  db_data:
+  gem_cache:
+  shared_data:
+services:
+  database:
+    image: postgres:13-alpine3.15
+    volumes:
+      - db_data:/var/lib/postgres/data
+      - shared_data:/var/shared
+    networks:
+      - development
+      - test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password 
+    ports:
+      - 5434:5432
+
+  database_ui:
+    image: dpage/pgadmin4:6.5
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - 5050:80
+    networks:
+      - development
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.2.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+    networks:
+      - development
+      - test
+
+  kafka:
+    image: confluentinc/cp-kafka:5.3.1
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 9997:9997
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      JMX_PORT: 9997
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka -Dcom.sun.management.jmxremote.rmi.port=9997
+    networks:
+      - development
+      - test
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8085:8080
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_JMXPORT: 9997
+    networks:
+      - development
+  redis:
+      image: redis:6.2.6-alpine
+      ports:
+       - "6379:6379"
+      environment:
+       - REDIS_REPLICATION_MODE=master
+      networks:
+        - development
+        - test

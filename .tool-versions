@@ -1,0 +1,4 @@
+ruby 3.1.2
+nodejs lts
+yarn 1.22.19
+sqlite 3.37.2

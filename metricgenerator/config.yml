@@ -1,0 +1,4 @@
+:schedule:
+  metric_generator_worker:
+    class: MetricGeneratorWorker
+    every: 1 seconds
