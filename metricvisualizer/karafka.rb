@@ -40,16 +40,16 @@ class KarafkaApp < Karafka::App
   # )
 
   consumer_groups.draw do
-    # consumer_group :broadcaster_group do
-    #   topic :metrics do
-    #     consumer MetricBroadcasterConsumer
-    #   end
-    # end
-    # consumer_group :average_calculator_group do
-    #   topic :metrics do
-    #     consumer MetricAveragePerMinuteConsumer
-    #   end
-    # end
+    consumer_group :broadcaster_group do
+      topic :metrics do
+        consumer MetricBroadcasterConsumer
+      end
+    end
+    consumer_group :average_calculator_group do
+      topic :metrics do
+        consumer MetricAveragePerMinuteConsumer
+      end
+    end
     consumer_group :persister_group do
       batch_fetching true
       max_wait_time 5
