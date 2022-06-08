@@ -32,7 +32,7 @@ class MetricAverage
       average_data['count'] = 0
     else
       average_data['count'] += 1
-      average_data['sum'] += value
+      average_data['sum'] += value.to_f
     end
     @average_data.value = average_data
     if average.positive?

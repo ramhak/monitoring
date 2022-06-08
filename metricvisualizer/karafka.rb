@@ -43,11 +43,13 @@ class KarafkaApp < Karafka::App
     consumer_group :broadcaster_group do
       topic :metrics do
         consumer MetricBroadcasterConsumer
+        start_from_beginning false
       end
     end
     consumer_group :average_calculator_group do
       topic :metrics do
         consumer MetricAveragePerMinuteConsumer
+        start_from_beginning false
       end
     end
     consumer_group :persister_group do
