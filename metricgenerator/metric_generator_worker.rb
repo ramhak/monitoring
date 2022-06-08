@@ -40,7 +40,7 @@ class MetricGeneratorWorker
     }
     @@producer.produce_many_sync(
       [
-        { topic: 'metrics', payload: btc_metric.to_json, key: 'BTC' }
+        { topic: 'metrics', payload: btc_metric.to_json, key: 'BTC' },
         { topic: 'metrics', payload: eth_metric.to_json, key: 'ETH' }
       ]
     )
